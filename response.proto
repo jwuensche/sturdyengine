@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package sturdyengine;
+
+message Response {
+  Error error = 1;
+  repeated ProcedureResult results = 2;
+}
+
+message ProcedureResult {
+  Error error = 1;
+  bytes value = 2;
+}
+
+message Error {
+  string service = 1;
+  string name = 2;
+  string description = 3;
+  string stack_trace = 4;
+}
