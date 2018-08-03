@@ -1,0 +1,24 @@
+name: gogetscience
+version: 0.1.0
+description: Go implementation of kRPC API for Kerbal Space Program
+authors:
+- Benjamin Sparks
+- ' Johannes Wuensche'
+license: ""
+package:
+  include: []
+args:
+  run: ""
+  go:
+    test: ""
+    build: ""
+    doc: ""
+    vet: ""
+    fmt: -s
+  glide:
+    install: ""
+    update: ""
+    get: ""
+  git:
+    tag: -s -m 'Update version'
+    clone: ""
