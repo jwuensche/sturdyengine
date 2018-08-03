@@ -3,7 +3,7 @@ version: 0.1.0
 description: Go implementation of kRPC API for Kerbal Space Program
 authors:
 - Benjamin Sparks
-- ' Johannes Wuensche'
+- Johannes Wuensche
 license: ""
 package:
   include: []
