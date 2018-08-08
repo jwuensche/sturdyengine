@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jwuensche/sturdy-engine"
+	"github.com/jwuensche/sturdyengine"
 	"github.com/op/go-logging"
 )
 
@@ -22,10 +22,24 @@ var format = logging.MustStringFormatter(
 )
 var backend = logging.NewLogBackend(os.Stderr, "", 0)
 
-func TestInitalizeApi(t *testing.T) {
-	c := sturdyengine.Connection{}
+//Declaring the connection on a global level to avoid redefining existing flag addre
+
+var c = sturdyengine.Connection{}
+
+func TestInitalizeApiAndClose(t *testing.T) {
+
 	if err := c.InitializeAPI("SturdyEngineTest"); err != nil {
 		log.Error(err)
 		t.FailNow()
 	}
+
+}
+
+func TestStatus(t *testing.T) {
+	r, e := c.GetStatus()
+	if e != nil {
+		log.Error(e)
+		t.FailNow()
+	}
+	log.Notice(r.String())
 }
