@@ -15,10 +15,8 @@ func (conn *Connection) InitializeAPI(clientName string) (e error) {
 		WriteBufferSize: 1024,
 	}
 
-	// TODO: This is silly....
-	u := url.URL{}
-	q := u.Query()
-	q.Set("name", clientName)
+	q := url.Values{}
+	q.Add("name", clientName)
 
 	conn.Uri = url.URL{
 		Scheme: "ws", Host: *flag.String("addr", "localhost:50000", "kRPC client"),
