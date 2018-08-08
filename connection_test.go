@@ -27,12 +27,10 @@ var backend = logging.NewLogBackend(os.Stderr, "", 0)
 var c = sturdyengine.Connection{}
 
 func TestInitalizeApiAndClose(t *testing.T) {
-
 	if err := c.InitializeAPI("SturdyEngineTest"); err != nil {
 		log.Error(err)
 		t.FailNow()
 	}
-
 }
 
 func TestStatus(t *testing.T) {
@@ -41,5 +39,9 @@ func TestStatus(t *testing.T) {
 		log.Error(e)
 		t.FailNow()
 	}
-	log.Notice(r.String())
+	log.Notice(r.GetVersion())
+}
+
+func TestClose(t *testing.T) {
+	c.Close()
 }

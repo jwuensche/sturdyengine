@@ -40,7 +40,7 @@ func (conn *Connection) Close() (e error) {
 }
 
 //GetStatus calls procedure `GetStatus` and returns the response in form of the proto buffer message
-func (conn *Connection) GetStatus() (res Response, e error) {
+func (conn *Connection) GetStatus() (res Status, e error) {
 
 	pc := ProcedureCall{
 		Service:   "KRPC",
@@ -58,7 +58,7 @@ func (conn *Connection) GetStatus() (res Response, e error) {
 	return
 }
 
-func (conn *Connection) sendMessage(r Request) (res Response, e error) {
+func (conn *Connection) sendMessage(r Request) (res Status, e error) {
 	req, e := proto.Marshal(&r)
 
 	if e != nil {
@@ -71,7 +71,7 @@ func (conn *Connection) sendMessage(r Request) (res Response, e error) {
 	if e != nil {
 		return
 	}
-	res = Response{}
+	res = Status{}
 	e = proto.Unmarshal(p, &res)
 	if e != nil {
 		return
