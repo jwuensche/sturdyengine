@@ -2,7 +2,6 @@ package sturdyengine
 
 import (
 	"flag"
-	"fmt"
 	"net/url"
 
 	"github.com/golang/protobuf/proto"
@@ -39,9 +38,8 @@ func (conn *Connection) Close() (e error) {
 	return
 }
 
-//GetStatus calls procedure `GetStatus` and returns the response in form of the proto buffer message
+//GetStatus calls remote procedure `GetStatus` and returns the response in form of the proto buffer message
 func (conn *Connection) GetStatus() (res Status, e error) {
-
 	pc := ProcedureCall{
 		Service:   "KRPC",
 		Procedure: "GetStatus",
@@ -50,16 +48,47 @@ func (conn *Connection) GetStatus() (res Status, e error) {
 		Calls: []*ProcedureCall{&pc},
 	}
 
-	res, e = conn.sendMessage(pr)
+	p, e := conn.sendMessage(&pr)
+	if e != nil {
+		return
+	}
 
-	fmt.Println(res.String())
+	r := Response{}
+	e = proto.Unmarshal(p, &r)
+	if e != nil {
+		return
+	}
+	e = proto.Unmarshal(r.GetResults()[0].GetValue(), &res)
 
-	e = nil
 	return
 }
 
-func (conn *Connection) sendMessage(r Request) (res Status, e error) {
-	req, e := proto.Marshal(&r)
+func (conn *Connection) GetServices() (res Services, e error) {
+	pc := ProcedureCall{
+		Service:   "KRPC",
+		Procedure: "GetServices",
+	}
+	pr := Request{
+		Calls: []*ProcedureCall{&pc},
+	}
+
+	p, e := conn.sendMessage(&pr)
+	if e != nil {
+		return
+	}
+
+	r := &Response{}
+	e = proto.Unmarshal(p, r)
+	if e != nil {
+		return
+	}
+	e = proto.Unmarshal(r.GetResults()[0].GetValue(), &res)
+
+	return
+}
+
+func (conn *Connection) sendMessage(r *Request) (p []byte, e error) {
+	req, e := proto.Marshal(r)
 
 	if e != nil {
 		return
@@ -67,12 +96,7 @@ func (conn *Connection) sendMessage(r Request) (res Status, e error) {
 
 	conn.Conn.WriteMessage(websocket.BinaryMessage, req)
 
-	_, p, e := conn.Conn.ReadMessage()
-	if e != nil {
-		return
-	}
-	res = Status{}
-	e = proto.Unmarshal(p, &res)
+	_, p, e = conn.Conn.ReadMessage()
 	if e != nil {
 		return
 	}
