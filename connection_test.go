@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/jwuensche/sturdyengine"
 	"github.com/op/go-logging"
 )
@@ -22,9 +23,38 @@ var format = logging.MustStringFormatter(
 )
 var backend = logging.NewLogBackend(os.Stderr, "", 0)
 
-//Declaring the connection on a global level to avoid redefining existing flag addre
+//Declaring the connection on a global level to avoid redefining existing flag address
 
 var c = sturdyengine.Connection{}
+
+func TestServiceProto(t *testing.T) {
+	ser := sturdyengine.Service{
+		Name:          "Foo",
+		Documentation: "Bar",
+	}
+
+	sers := sturdyengine.Services{
+		Services: []*sturdyengine.Service{&ser},
+	}
+
+	p, e := proto.Marshal(&sers)
+	if e != nil {
+		log.Fatal(e)
+		t.FailNow()
+	}
+
+	test := &sturdyengine.Services{}
+
+	proto.Unmarshal(p, test)
+
+	log.Info("Raw: " + test.String())
+
+	if sers.GetServices()[0].Name != test.GetServices()[0].Name {
+		log.Fatal("Unmarshaled unequal to original structure")
+		t.FailNow()
+	}
+
+}
 
 func TestInitalizeApiAndClose(t *testing.T) {
 	if err := c.InitializeAPI("SturdyEngineTest"); err != nil {
@@ -39,7 +69,21 @@ func TestStatus(t *testing.T) {
 		log.Error(e)
 		t.FailNow()
 	}
-	log.Notice(r.GetVersion())
+	log.Info("Raw : " + r.String())
+	log.Info("kRPC Server Version: " + r.GetVersion())
+	log.Info(r.GetRpcsExecuted())
+}
+
+func TestServices(t *testing.T) {
+	r, e := c.GetServices()
+	if e != nil {
+		log.Error(e)
+		t.FailNow()
+	}
+
+	for _, service := range r.GetServices() {
+		log.Info(service.Name)
+	}
 }
 
 func TestClose(t *testing.T) {
