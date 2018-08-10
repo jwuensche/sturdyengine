@@ -27,6 +27,7 @@ func (conn *Connection) GetStatus() (res Status, e error) {
 	return
 }
 
+//GetServices calls KRPC remote procedure `GetServices` and returns Service Structure
 func (conn *Connection) GetServices() (res Services, e error) {
 	pc := ProcedureCall{
 		Service:   "KRPC",

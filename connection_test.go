@@ -2,6 +2,7 @@ package sturdyengine_test
 
 import (
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -75,7 +76,7 @@ func TestStatus(t *testing.T) {
 	}
 	log.Info("Raw : " + r.String())
 	log.Info("kRPC Server Version: " + r.GetVersion())
-	log.Info(r.GetRpcsExecuted())
+	log.Info("RPCs: " + strconv.FormatUint(r.GetRpcsExecuted(), 10))
 }
 
 func TestServices(t *testing.T) {
@@ -89,14 +90,50 @@ func TestServices(t *testing.T) {
 		t.FailNow()
 	}
 
+	f, _ := os.Create("procedure_doc.md")
+	defer f.Close()
+
 	for _, service := range r.GetServices() {
-		log.Info(service.Name)
-		log.Info("--------------")
+		f.WriteString("## " + service.GetName() + "\n")
+		f.WriteString("#### Classes\n")
+		for _, class := range service.GetClasses() {
+			f.WriteString("```\n" + class.GetName() + "\n" + class.GetDocumentation() + "\n```\n")
+		}
 		for _, procedure := range service.GetProcedures() {
-			log.Info(procedure.GetName())
-			log.Info(procedure.GetDocumentation())
+			f.WriteString("### " + procedure.GetName() + "\n\n")
+			f.WriteString("```\n" + procedure.GetDocumentation() + "\n```\n")
+			f.WriteString("#### Parameters \n")
+			for _, parameter := range procedure.GetParameters() {
+				f.WriteString("```\n")
+				f.WriteString(parameter.GetName() + "		" + parameter.GetType().GetName() + "\n")
+				f.WriteString("```\n")
+			}
+			f.WriteString("#### Return \n")
+			f.WriteString("```\n" + procedure.GetReturnType().GetName() + "```\n")
 		}
 	}
+}
+
+func TestSpaceCenter(t *testing.T) {
+	//Get current vessel
+	vessel, e := c.GetActiveVessel()
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	//Get current vessels control
+	control, e := c.GetVesselControl(vessel)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	//Use current control
+	_, e = c.ActivateNextStage(control)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	// c.GetGameMode()
 }
 
 func TestClose(t *testing.T) {
