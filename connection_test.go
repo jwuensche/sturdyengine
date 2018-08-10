@@ -64,6 +64,10 @@ func TestInitalizeApiAndClose(t *testing.T) {
 }
 
 func TestStatus(t *testing.T) {
+	if c.Conn == nil {
+		t.FailNow()
+		return
+	}
 	r, e := c.GetStatus()
 	if e != nil {
 		log.Error(e)
@@ -75,6 +79,10 @@ func TestStatus(t *testing.T) {
 }
 
 func TestServices(t *testing.T) {
+	if c.Conn == nil {
+		t.FailNow()
+		return
+	}
 	r, e := c.GetServices()
 	if e != nil {
 		log.Error(e)
@@ -83,9 +91,18 @@ func TestServices(t *testing.T) {
 
 	for _, service := range r.GetServices() {
 		log.Info(service.Name)
+		log.Info("--------------")
+		for _, procedure := range service.GetProcedures() {
+			log.Info(procedure.GetName())
+			log.Info(procedure.GetDocumentation())
+		}
 	}
 }
 
 func TestClose(t *testing.T) {
+	if c.Conn == nil {
+		t.FailNow()
+		return
+	}
 	c.Close()
 }

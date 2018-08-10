@@ -23,7 +23,9 @@ func (conn *Connection) InitializeAPI(clientName string) (e error) {
 	}
 
 	c, _, e := websocket.DefaultDialer.Dial(conn.Uri.String(), nil)
-	conn.Conn = c
+	if e == nil {
+		conn.Conn = c
+	}
 
 	return
 }
@@ -38,55 +40,6 @@ func (conn *Connection) Close() (e error) {
 	return
 }
 
-//GetStatus calls remote procedure `GetStatus` and returns the response in form of the proto buffer message
-func (conn *Connection) GetStatus() (res Status, e error) {
-	pc := ProcedureCall{
-		Service:   "KRPC",
-		Procedure: "GetStatus",
-	}
-	pr := Request{
-		Calls: []*ProcedureCall{&pc},
-	}
-
-	p, e := conn.sendMessage(&pr)
-	if e != nil {
-		return
-	}
-
-	r := Response{}
-	e = proto.Unmarshal(p, &r)
-	if e != nil {
-		return
-	}
-	e = proto.Unmarshal(r.GetResults()[0].GetValue(), &res)
-
-	return
-}
-
-func (conn *Connection) GetServices() (res Services, e error) {
-	pc := ProcedureCall{
-		Service:   "KRPC",
-		Procedure: "GetServices",
-	}
-	pr := Request{
-		Calls: []*ProcedureCall{&pc},
-	}
-
-	p, e := conn.sendMessage(&pr)
-	if e != nil {
-		return
-	}
-
-	r := &Response{}
-	e = proto.Unmarshal(p, r)
-	if e != nil {
-		return
-	}
-	e = proto.Unmarshal(r.GetResults()[0].GetValue(), &res)
-
-	return
-}
-
 func (conn *Connection) sendMessage(r *Request) (p []byte, e error) {
 	req, e := proto.Marshal(r)
 
@@ -95,7 +48,6 @@ func (conn *Connection) sendMessage(r *Request) (p []byte, e error) {
 	}
 
 	conn.Conn.WriteMessage(websocket.BinaryMessage, req)
-
 	_, p, e = conn.Conn.ReadMessage()
 	if e != nil {
 		return
