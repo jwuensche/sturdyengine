@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/jwuensche/sturdyengine/pkg"
@@ -134,6 +135,17 @@ func TestSpaceCenter(t *testing.T) {
 		t.FailNow()
 	}
 	// c.GetGameMode()
+	_, e = c.SetSAS(control, true)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	time.Sleep(10 * time.Second)
+	_, e = c.SetSAS(control, false)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
 }
 
 func TestClose(t *testing.T) {

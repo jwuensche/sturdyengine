@@ -1,8 +1,6 @@
 package sturdyengine
 
 import (
-	"fmt"
-
 	"github.com/golang/protobuf/proto"
 )
 
@@ -46,13 +44,28 @@ func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
 	return
 }
 
-func (conn *Connection) SetSAS() (r, e error) {
-	pr := createRequest("SpaceCenter", "set_SASMode", nil)
+func (conn *Connection) SetSAS(vessel []byte, state bool) (r, e error) {
+	var s []byte
+	if state == true {
+		s = []byte{byte(1)}
+	} else {
+		s = []byte{byte(0)}
+	}
+	arg := []*Argument{
+		&Argument{
+			Position: 0,
+			Value:    vessel,
+		},
+		&Argument{
+			Position: 1,
+			Value:    s,
+		},
+	}
+	pr := createRequest("SpaceCenter", "Control_set_SAS", arg)
 
 	p, e := conn.sendMessage(pr)
 	res := &Response{}
 	proto.Unmarshal(p, res)
-	fmt.Println(res.String())
 
 	return
 }
