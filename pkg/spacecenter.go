@@ -7,13 +7,7 @@ import (
 )
 
 func (conn *Connection) GetGameMode() (r, e error) {
-	pc := &ProcedureCall{
-		Service:   "SpaceCenter.Vessel.Control",
-		Procedure: "get_GameMode",
-	}
-	pr := &Request{
-		Calls: []*ProcedureCall{pc},
-	}
+	pr := createRequest("SpaceCenter", "get_GameMode", nil)
 
 	p, e := conn.sendMessage(pr)
 	res := &Response{}
@@ -23,13 +17,7 @@ func (conn *Connection) GetGameMode() (r, e error) {
 }
 
 func (conn *Connection) GetActiveVessel() (r []byte, e error) {
-	pc := &ProcedureCall{
-		Service:   "SpaceCenter",
-		Procedure: "get_ActiveVessel",
-	}
-	pr := &Request{
-		Calls: []*ProcedureCall{pc},
-	}
+	pr := createRequest("SpaceCenter", "get_ActiveVessel", nil)
 
 	p, e := conn.sendMessage(pr)
 	res := &Response{}
@@ -39,17 +27,11 @@ func (conn *Connection) GetActiveVessel() (r []byte, e error) {
 }
 
 func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
-	pc := &ProcedureCall{
-		Service:   "SpaceCenter",
-		Procedure: "Vessel_get_Control",
-		Arguments: []*Argument{&Argument{
-			Position: 0,
-			Value:    vessel,
-		}},
-	}
-	pr := &Request{
-		Calls: []*ProcedureCall{pc},
-	}
+	arg := []*Argument{&Argument{
+		Position: 0,
+		Value:    vessel,
+	}}
+	pr := createRequest("SpaceCenter", "Vessel_get_Control", arg)
 
 	p, e := conn.sendMessage(pr)
 	if e != nil {
@@ -65,13 +47,7 @@ func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
 }
 
 func (conn *Connection) SetSAS() (r, e error) {
-	pc := &ProcedureCall{
-		Service:   "SpaceCenter",
-		Procedure: "set_SASMode",
-	}
-	pr := &Request{
-		Calls: []*ProcedureCall{pc},
-	}
+	pr := createRequest("SpaceCenter", "set_SASMode", nil)
 
 	p, e := conn.sendMessage(pr)
 	res := &Response{}
@@ -81,18 +57,13 @@ func (conn *Connection) SetSAS() (r, e error) {
 	return
 }
 
-func (conn *Connection) ActivateNextStage(vessel []byte) (r, e error) {
-	pc := &ProcedureCall{
-		Service:   "SpaceCenter",
-		Procedure: "Control_ActivateNextStage",
-		Arguments: []*Argument{&Argument{
-			Position: 0,
-			Value:    vessel,
-		}},
-	}
-	pr := &Request{
-		Calls: []*ProcedureCall{pc},
-	}
+func (conn *Connection) ActivateNextStage(vessel []byte) (e error) {
+
+	arg := []*Argument{&Argument{
+		Position: 0,
+		Value:    vessel,
+	}}
+	pr := createRequest("SpaceCenter", "Control_ActivateNextStage", arg)
 
 	p, e := conn.sendMessage(pr)
 	if e != nil {
@@ -101,5 +72,17 @@ func (conn *Connection) ActivateNextStage(vessel []byte) (r, e error) {
 	res := &Response{}
 	proto.Unmarshal(p, res)
 
+	return
+}
+
+func createRequest(service string, procedure string, arguments []*Argument) (pr *Request) {
+	pc := &ProcedureCall{
+		Service:   service,
+		Procedure: procedure,
+		Arguments: arguments,
+	}
+	pr = &Request{
+		Calls: []*ProcedureCall{pc},
+	}
 	return
 }

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/jwuensche/sturdyengine"
+	"github.com/jwuensche/sturdyengine/pkg"
 	"github.com/op/go-logging"
 )
 
@@ -90,7 +90,7 @@ func TestServices(t *testing.T) {
 		t.FailNow()
 	}
 
-	f, _ := os.Create("procedure_doc.md")
+	f, _ := os.Create("docs/procedure_doc.md")
 	defer f.Close()
 
 	for _, service := range r.GetServices() {
@@ -127,8 +127,8 @@ func TestSpaceCenter(t *testing.T) {
 		log.Info(e)
 		t.FailNow()
 	}
-	//Use current control
-	_, e = c.ActivateNextStage(control)
+	//Test Control
+	e = c.ActivateNextStage(control)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()

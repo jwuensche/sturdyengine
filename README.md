@@ -8,5 +8,5 @@ Go implementation of kRPC API for Kerbal Space Program
 ## How to install
 
 ```bash
-$ go get github.com/jwuensche/sturdy-engine
+$ go get github.com/jwuensche/sturdyengine
 ```

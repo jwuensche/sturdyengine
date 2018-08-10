@@ -1,6 +1,10 @@
-hash: caf1224c4dacdf1fb7a75f2b8e23a47669dbb3331f4eb5cc5ce7ada843c7a55a
-updated: 2018-08-03T15:39:05.58280516+02:00
+hash: fc178ab69049a8c2867cb895f0e414d5d79920160b349fc57f82f19b3acbe25c
+updated: 2018-08-10T12:18:20.312739023+02:00
 imports:
+- name: github.com/golang/protobuf
+  version: 89a0c16f4dc2a70c0ed864d8ef64878f24fdaa51
+  subpackages:
+  - proto
 - name: github.com/gorilla/websocket
   version: 5ed622c449da6d44c3c8329331ff47a9e5844f71
 testImports:
