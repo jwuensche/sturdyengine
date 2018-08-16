@@ -17,3 +17,12 @@ func float32toByte(r float32) (b []byte) {
 	binary.LittleEndian.PutUint32(b, bits)
 	return
 }
+
+func boolTobyte(state bool) (b []byte) {
+	if state {
+		b = []byte{byte(1)}
+	} else {
+		b = []byte{byte(0)}
+	}
+	return
+}

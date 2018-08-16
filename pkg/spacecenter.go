@@ -32,12 +32,11 @@ func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 	return
 }
 
+// CONTROL - SPACECENTER.VESSEL.CONTROL
+
 func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
-	arg := []*Argument{&Argument{
-		Position: 0,
-		Value:    vessel,
-	}}
-	pr := createRequest("SpaceCenter", "Vessel_get_Control", arg)
+	arg := [][]byte{vessel}
+	pr := createRequest("SpaceCenter", "Vessel_get_Control", createArguments(arg))
 
 	p, e := sc.conn.sendMessage(pr)
 	if e != nil {
@@ -48,30 +47,15 @@ func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	if e != nil {
 		return
 	}
+
 	r = res.GetResults()[0].GetValue()
 	return
 }
 
-// CONTROL - SPACECENTER.VESSEL.CONTROL
-
 func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (r, e error) {
-	var s []byte
-	if state {
-		s = []byte{byte(1)}
-	} else {
-		s = []byte{byte(0)}
-	}
-	arg := []*Argument{
-		&Argument{
-			Position: 0,
-			Value:    vessel,
-		},
-		&Argument{
-			Position: 1,
-			Value:    s,
-		},
-	}
-	pr := createRequest("SpaceCenter", "Control_set_SAS", arg)
+	s := boolTobyte(state)
+	arg := [][]byte{vessel, s}
+	pr := createRequest("SpaceCenter", "Control_set_SAS", createArguments(arg))
 
 	p, e := sc.conn.sendMessage(pr)
 	res := &Response{}
@@ -82,11 +66,8 @@ func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (r, e error) {
 
 func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
 
-	arg := []*Argument{&Argument{
-		Position: 0,
-		Value:    vessel,
-	}}
-	pr := createRequest("SpaceCenter", "Control_ActivateNextStage", arg)
+	arg := [][]byte{vessel}
+	pr := createRequest("SpaceCenter", "Control_ActivateNextStage", createArguments(arg))
 
 	p, e := sc.conn.sendMessage(pr)
 	if e != nil {
@@ -99,11 +80,8 @@ func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
 }
 
 func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
-	arg := []*Argument{&Argument{
-		Position: 0,
-		Value:    sc.Control,
-	}}
-	pr := createRequest("SpaceCenter", "Control_get_Throttle", arg)
+	arg := [][]byte{sc.Control}
+	pr := createRequest("SpaceCenter", "Control_get_Throttle", createArguments(arg))
 	p, e := sc.conn.sendMessage(pr)
 	if e != nil {
 		return
@@ -115,18 +93,8 @@ func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
 }
 
 func (sc *SpaceCenter) SetThrottle(val float32) (e error) {
-	arg := []*Argument{
-		&Argument{
-			Position: 0,
-			Value:    sc.Control,
-		},
-		&Argument{
-			Position: 1,
-			Value:    float32toByte(val),
-		},
-	}
-
-	pr := createRequest("SpaceCenter", "Control_set_Throttle", arg)
+	arg := [][]byte{sc.Control, float32toByte(val)}
+	pr := createRequest("SpaceCenter", "Control_set_Throttle", createArguments(arg))
 	_, e = sc.conn.sendMessage(pr)
 
 	return
@@ -152,6 +120,16 @@ func createRequest(service string, procedure string, arguments []*Argument) (pr 
 	}
 	pr = &Request{
 		Calls: []*ProcedureCall{pc},
+	}
+	return
+}
+
+func createArguments(args [][]byte) (arg []*Argument) {
+	for pos, val := range args {
+		arg = append(arg, &Argument{
+			Position: uint32(pos),
+			Value:    val,
+		})
 	}
 	return
 }
