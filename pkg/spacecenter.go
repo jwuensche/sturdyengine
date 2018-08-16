@@ -4,34 +4,42 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-func (conn *Connection) GetGameMode() (r, e error) {
+func InitSpaceCenter(conn *Connection) (sc SpaceCenter, e error) {
+	sc = SpaceCenter{}
+	sc.conn = conn
+	sc.Vessel, e = sc.GetActiveVessel()
+	sc.Control, e = sc.GetVesselControl(sc.Vessel)
+	return
+}
+
+func (sc *SpaceCenter) GetGameMode() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_GameMode", nil)
 
-	p, e := conn.sendMessage(pr)
+	p, e := sc.conn.sendMessage(pr)
 	res := &Response{}
 	proto.Unmarshal(p, res)
 
 	return
 }
 
-func (conn *Connection) GetActiveVessel() (r []byte, e error) {
+func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_ActiveVessel", nil)
 
-	p, e := conn.sendMessage(pr)
+	p, e := sc.conn.sendMessage(pr)
 	res := &Response{}
 	proto.Unmarshal(p, res)
 	r = res.GetResults()[0].GetValue()
 	return
 }
 
-func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
+func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	arg := []*Argument{&Argument{
 		Position: 0,
 		Value:    vessel,
 	}}
 	pr := createRequest("SpaceCenter", "Vessel_get_Control", arg)
 
-	p, e := conn.sendMessage(pr)
+	p, e := sc.conn.sendMessage(pr)
 	if e != nil {
 		return
 	}
@@ -44,7 +52,7 @@ func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
 	return
 }
 
-func (conn *Connection) SetSAS(vessel []byte, state bool) (r, e error) {
+func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (r, e error) {
 	var s []byte
 	if state {
 		s = []byte{byte(1)}
@@ -63,14 +71,14 @@ func (conn *Connection) SetSAS(vessel []byte, state bool) (r, e error) {
 	}
 	pr := createRequest("SpaceCenter", "Control_set_SAS", arg)
 
-	p, e := conn.sendMessage(pr)
+	p, e := sc.conn.sendMessage(pr)
 	res := &Response{}
 	proto.Unmarshal(p, res)
 
 	return
 }
 
-func (conn *Connection) ActivateNextStage(vessel []byte) (e error) {
+func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
 
 	arg := []*Argument{&Argument{
 		Position: 0,
@@ -78,13 +86,25 @@ func (conn *Connection) ActivateNextStage(vessel []byte) (e error) {
 	}}
 	pr := createRequest("SpaceCenter", "Control_ActivateNextStage", arg)
 
-	p, e := conn.sendMessage(pr)
+	p, e := sc.conn.sendMessage(pr)
 	if e != nil {
 		return
 	}
 	res := &Response{}
 	proto.Unmarshal(p, res)
 
+	return
+}
+
+func (sc *SpaceCenter) Quicksave() (e error) {
+	pr := createRequest("SpaceCenter", "Quicksave", nil)
+	_, e = sc.conn.sendMessage(pr)
+	return
+}
+
+func (sc *SpaceCenter) Quickload() (e error) {
+	pr := createRequest("SpaceCenter", "Quickload", nil)
+	_, e = sc.conn.sendMessage(pr)
 	return
 }
 

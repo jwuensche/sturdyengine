@@ -12,3 +12,9 @@ type Connection struct {
 	Upgrader websocket.Upgrader
 	Conn     *websocket.Conn
 }
+
+type SpaceCenter struct {
+	conn    *Connection
+	Vessel  []byte
+	Control []byte
+}

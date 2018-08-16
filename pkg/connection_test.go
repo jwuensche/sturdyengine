@@ -120,32 +120,50 @@ func TestSpaceCenter(t *testing.T) {
 		t.FailNow()
 		return
 	}
+	//InitSpaceCenter
+	sc, e := sturdyengine.InitSpaceCenter(&c)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	//Quicksave
+	e = sc.Quicksave()
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
 	//Get current vessel
-	vessel, e := c.GetActiveVessel()
+	_, e = sc.GetActiveVessel()
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
 	//Get current vessels control
-	control, e := c.GetVesselControl(vessel)
+	control, e := sc.GetVesselControl(sc.Vessel)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
 	//Test Control
-	e = c.ActivateNextStage(control)
+	e = sc.ActivateNextStage(control)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
 	// c.GetGameMode()
-	_, e = c.SetSAS(control, true)
+	_, e = sc.SetSAS(control, true)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
 	time.Sleep(10 * time.Second)
-	_, e = c.SetSAS(control, false)
+	_, e = sc.SetSAS(control, false)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	//Quickload
+	e = sc.Quickload()
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
