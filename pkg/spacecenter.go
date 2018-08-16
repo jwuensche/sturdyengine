@@ -52,6 +52,8 @@ func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	return
 }
 
+// CONTROL - SPACECENTER.VESSEL.CONTROL
+
 func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (r, e error) {
 	var s []byte
 	if state {
@@ -92,6 +94,40 @@ func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
 	}
 	res := &Response{}
 	proto.Unmarshal(p, res)
+
+	return
+}
+
+func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
+	arg := []*Argument{&Argument{
+		Position: 0,
+		Value:    sc.Control,
+	}}
+	pr := createRequest("SpaceCenter", "Control_get_Throttle", arg)
+	p, e := sc.conn.sendMessage(pr)
+	if e != nil {
+		return
+	}
+	res := &Response{}
+	proto.Unmarshal(p, res)
+	val = byteToFloat32(res.GetResults()[0].GetValue())
+	return
+}
+
+func (sc *SpaceCenter) SetThrottle(val float32) (e error) {
+	arg := []*Argument{
+		&Argument{
+			Position: 0,
+			Value:    sc.Control,
+		},
+		&Argument{
+			Position: 1,
+			Value:    float32toByte(val),
+		},
+	}
+
+	pr := createRequest("SpaceCenter", "Control_set_Throttle", arg)
+	_, e = sc.conn.sendMessage(pr)
 
 	return
 }

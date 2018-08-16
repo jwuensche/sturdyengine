@@ -156,7 +156,12 @@ func TestSpaceCenter(t *testing.T) {
 		log.Info(e)
 		t.FailNow()
 	}
-	time.Sleep(10 * time.Second)
+	//Throttle
+	sc.SetThrottle(0.54)
+	val, e := sc.GetThrottle()
+	log.Info(val)
+
+	time.Sleep(2 * time.Second)
 	_, e = sc.SetSAS(control, false)
 	if e != nil {
 		log.Info(e)
