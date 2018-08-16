@@ -116,6 +116,10 @@ func TestServices(t *testing.T) {
 }
 
 func TestSpaceCenter(t *testing.T) {
+	if c.Conn == nil {
+		t.FailNow()
+		return
+	}
 	//Get current vessel
 	vessel, e := c.GetActiveVessel()
 	if e != nil {

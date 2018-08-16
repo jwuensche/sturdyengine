@@ -46,7 +46,7 @@ func (conn *Connection) GetVesselControl(vessel []byte) (r []byte, e error) {
 
 func (conn *Connection) SetSAS(vessel []byte, state bool) (r, e error) {
 	var s []byte
-	if state == true {
+	if state {
 		s = []byte{byte(1)}
 	} else {
 		s = []byte{byte(0)}
