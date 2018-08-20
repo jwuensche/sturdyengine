@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 	"github.com/jwuensche/sturdyengine/pkg"
-	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
 	"github.com/op/go-logging"
 )
 

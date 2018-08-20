@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
-	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
+	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
 // InitializeAPI sets informations required by the connection and also creates said. If the connection cannot be established returns error and struct member Conn is unset

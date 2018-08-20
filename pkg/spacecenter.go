@@ -2,7 +2,7 @@ package sturdyengine
 
 import (
 	"github.com/golang/protobuf/proto"
-	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
+	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
 //InitSpaceCenter creates a SpaceCenter instance with Vessel and Control being set to the current active Values

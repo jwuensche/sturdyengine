@@ -2,7 +2,7 @@ package sturdyengine
 
 import (
 	"github.com/golang/protobuf/proto"
-	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
+	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
 //GetStatus calls remote procedure `GetStatus` and returns the response in form of the proto buffer message
