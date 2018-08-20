@@ -2,12 +2,10 @@ package sturdyengine
 
 import (
 	"encoding/binary"
-	"fmt"
 	"math"
 )
 
 func byteToFloat32(r []byte) (f32 float32) {
-	fmt.Println(r)
 	bits := binary.LittleEndian.Uint32(r)
 	f32 = math.Float32frombits(bits)
 	return
@@ -30,7 +28,6 @@ func boolToByte(state bool) (b []byte) {
 }
 
 func byteToFloat64(r []byte) (f64 float64) {
-	fmt.Println(r)
 	bits := binary.LittleEndian.Uint64(r)
 	f64 = math.Float64frombits(bits)
 	return

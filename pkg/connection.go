@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// InitializeAPI sets informations required by the connection and also creates said. If the connection cannot be established returns error and struct member Conn is unset
 func (conn *Connection) InitializeAPI(clientName string) (e error) {
 	conn.Upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -17,19 +18,19 @@ func (conn *Connection) InitializeAPI(clientName string) (e error) {
 	q := url.Values{}
 	q.Add("name", clientName)
 
-	conn.Uri = url.URL{
+	conn.URI = url.URL{
 		Scheme: "ws", Host: *flag.String("addr", "localhost:50000", "kRPC client"),
 		RawQuery: q.Encode(),
 	}
 
-	c, _, e := websocket.DefaultDialer.Dial(conn.Uri.String(), nil)
+	c, _, e := websocket.DefaultDialer.Dial(conn.URI.String(), nil)
 	if e == nil {
 		conn.Conn = c
 	}
-
 	return
 }
 
+// Close closes the current connection
 func (conn *Connection) Close() (e error) {
 
 	e = conn.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))

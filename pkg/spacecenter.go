@@ -4,6 +4,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
+//InitSpaceCenter creates a SpaceCenter instance with Vessel and Control being set to the current active Values
 func InitSpaceCenter(conn *Connection) (sc SpaceCenter, e error) {
 	sc = SpaceCenter{}
 	sc.conn = conn
@@ -12,6 +13,7 @@ func InitSpaceCenter(conn *Connection) (sc SpaceCenter, e error) {
 	return
 }
 
+//GetGameMode returns the current active GameMode (currently not implemented)
 func (sc *SpaceCenter) GetGameMode() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_GameMode", nil)
 
@@ -22,6 +24,7 @@ func (sc *SpaceCenter) GetGameMode() (r []byte, e error) {
 	return
 }
 
+//GetActiveVessel returns the current active Vessel as byte slice
 func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_ActiveVessel", nil)
 
@@ -34,6 +37,7 @@ func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 
 // ORBIT - SPACECENTER.VESSEL.ORBIT || SPACECENTER.CELESTIALBODY.ORBIT
 
+//GetVesselOrbit returns a snapshot of the current orbit the vessel is on
 func (sc *SpaceCenter) GetVesselOrbit(vessel []byte) (orb []byte, e error) {
 	arg := [][]byte{vessel}
 	pr := createRequest("SpaceCenter", "Vessel_get_Orbit", createArguments(arg))
@@ -44,57 +48,68 @@ func (sc *SpaceCenter) GetVesselOrbit(vessel []byte) (orb []byte, e error) {
 	return
 }
 
+//GetApoapsisAltitude returns the apoapsis of the orbit relative to the surface the reference object in meters
 func (sc *SpaceCenter) GetApoapsisAltitude(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_ApoapsisAltitude")
 	return
 }
 
+//GetPeriapsisAltitude returns the periapsis of the orbit relative to the surface the reference object in meters
 func (sc *SpaceCenter) GetPeriapsisAltitude(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_PeriapsisAltitude")
 	return
 }
 
+//GetSemiMajorAxis returns the semi-major axis in meters
 func (sc *SpaceCenter) GetSemiMajorAxis(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_SemiMajorAxis")
 	return
 }
 
+//GetSemiMinorAxis returns the semi-minor axis in meters
 func (sc *SpaceCenter) GetSemiMinorAxis(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_SemiMinorAxis")
 	return
 }
 
+//GetRadius returns the current radius to the center of mass of the reference object in meters
 func (sc *SpaceCenter) GetRadius(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_Radius")
 	return
 }
 
+//GetSpeed returns the current speed of the object in meters
 func (sc *SpaceCenter) GetSpeed(orbit []byte) (alt float64, e error) {
 	alt, e = sc.getOrbitInfo(orbit, "Orbit_get_Speed")
 	return
 }
 
+//GetPeriod returns the orbital period in seconds
 func (sc *SpaceCenter) GetPeriod(orbit []byte) (time float64, e error) {
 	time, e = sc.getOrbitInfo(orbit, "Orbit_get_Period")
 	return
 }
 
+//GetTimeToApoapsis returns the time to apoapsis in seconds
 func (sc *SpaceCenter) GetTimeToApoapsis(orbit []byte) (time float64, e error) {
 	time, e = sc.getOrbitInfo(orbit, "Orbit_get_TimeToApoapsis")
 	return
 }
 
+//GetTimeToApoapsis returns the time to periapsis in seconds
 func (sc *SpaceCenter) GetTimeToPeriapsis(orbit []byte) (time float64, e error) {
 	time, e = sc.getOrbitInfo(orbit, "Orbit_get_TimeToPeriapsis")
 	return
 }
 
+//GetEpoch returns the time since the epoch at which mean anomaly at epoch was measured in seconds
 func (sc *SpaceCenter) GetEpoch(orbit []byte) (time float64, e error) {
 	time, e = sc.getOrbitInfo(orbit, "Orbit_get_Epoch")
 	return
 }
 
-func (sc *SpaceCenter) GetEccentricty(orbit []byte) (ecc float32, e error) {
+// GetEccentricity returns the eccentricity of the given orbit
+func (sc *SpaceCenter) GetEccentricity(orbit []byte) (ecc float32, e error) {
 	ecc, e = sc.getOrbitInfoFloat32(orbit, "Orbit_get_Eccentricity")
 	return
 }
@@ -127,6 +142,7 @@ func (sc *SpaceCenter) getOrbitInfoFloat32(orbit []byte, procedure string) (alt 
 
 // CONTROL - SPACECENTER.VESSEL.CONTROL
 
+//GetVesselControl returns control object to a given vessel
 func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	arg := [][]byte{vessel}
 	pr := createRequest("SpaceCenter", "Vessel_get_Control", createArguments(arg))
@@ -145,6 +161,7 @@ func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	return
 }
 
+//GetSAS returns the current state of the given control unit SAS, true in case it is activated
 func (sc *SpaceCenter) GetSAS(control []byte) (r bool, e error) {
 	arg := [][]byte{control}
 	pr := createRequest("SpaceCenter", "Control_get_SAS", createArguments(arg))
@@ -155,21 +172,20 @@ func (sc *SpaceCenter) GetSAS(control []byte) (r bool, e error) {
 	return
 }
 
+//SetSAS sets the state of the given control unit's SAS, true to activate
 func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (e error) {
 	s := boolToByte(state)
 	arg := [][]byte{vessel, s}
 	pr := createRequest("SpaceCenter", "Control_set_SAS", createArguments(arg))
 
-	p, e := sc.conn.sendMessage(pr)
-	res := &Response{}
-	proto.Unmarshal(p, res)
-
+	_, e = sc.conn.sendMessage(pr)
 	return
 }
 
-func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
+//ActivateNextStage activate the next stage of the given control unit
+func (sc *SpaceCenter) ActivateNextStage(control []byte) (e error) {
 
-	arg := [][]byte{vessel}
+	arg := [][]byte{control}
 	pr := createRequest("SpaceCenter", "Control_ActivateNextStage", createArguments(arg))
 
 	p, e := sc.conn.sendMessage(pr)
@@ -182,6 +198,7 @@ func (sc *SpaceCenter) ActivateNextStage(vessel []byte) (e error) {
 	return
 }
 
+//GetThrottle returns the Throtlle of the given control unit as float value between 0 and 1
 func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
 	arg := [][]byte{sc.Control}
 	pr := createRequest("SpaceCenter", "Control_get_Throttle", createArguments(arg))
@@ -195,6 +212,7 @@ func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
 	return
 }
 
+//SetThrottle sets the Throtlle of the given control unit as float value between 0 and 1
 func (sc *SpaceCenter) SetThrottle(val float32) (e error) {
 	arg := [][]byte{sc.Control, float32toByte(val)}
 	pr := createRequest("SpaceCenter", "Control_set_Throttle", createArguments(arg))
@@ -203,12 +221,14 @@ func (sc *SpaceCenter) SetThrottle(val float32) (e error) {
 	return
 }
 
+//Quicksave creates a Quicksave
 func (sc *SpaceCenter) Quicksave() (e error) {
 	pr := createRequest("SpaceCenter", "Quicksave", nil)
 	_, e = sc.conn.sendMessage(pr)
 	return
 }
 
+//Quickload loads the last used Quicksave
 func (sc *SpaceCenter) Quickload() (e error) {
 	pr := createRequest("SpaceCenter", "Quickload", nil)
 	_, e = sc.conn.sendMessage(pr)

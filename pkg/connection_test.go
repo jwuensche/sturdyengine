@@ -160,6 +160,10 @@ func TestSpaceCenter(t *testing.T) {
 	//Throttle
 	sc.SetThrottle(0.54)
 	_, e = sc.GetThrottle()
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
 
 	time.Sleep(2 * time.Second)
 	e = sc.SetSAS(control, false)
