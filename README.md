@@ -1,5 +1,8 @@
 # sturdyengine
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/jwuensche/sturdyengine)](https://goreportcard.com/report/github.com/jwuensche/sturdyengine)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/jwuensche/sturdyengine/pkg)
+
 Go implementation of kRPC API for Kerbal Space Program
 
 ## How to install
