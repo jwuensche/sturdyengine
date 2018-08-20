@@ -133,7 +133,7 @@ func TestSpaceCenter(t *testing.T) {
 		t.FailNow()
 	}
 	//Get current vessel
-	_, e = sc.GetActiveVessel()
+	vessel, e := sc.GetActiveVessel()
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
@@ -151,22 +151,47 @@ func TestSpaceCenter(t *testing.T) {
 		t.FailNow()
 	}
 	// c.GetGameMode()
-	_, e = sc.SetSAS(control, true)
+	e = sc.SetSAS(control, true)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
+	sc.GetSAS(control)
 	//Throttle
 	sc.SetThrottle(0.54)
-	val, e := sc.GetThrottle()
-	log.Info(val)
+	_, e = sc.GetThrottle()
 
 	time.Sleep(2 * time.Second)
-	_, e = sc.SetSAS(control, false)
+	e = sc.SetSAS(control, false)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
 	}
+
+	sc.GetSAS(control)
+	orb, e := sc.GetVesselOrbit(vessel)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	alt, e := sc.GetApoapsisAltitude(orb)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	log.Info(alt)
+	time, e := sc.GetTimeToApoapsis(orb)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	log.Info(time)
+	alt, e = sc.GetRadius(orb)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	log.Info(alt)
 	//Quickload
 	e = sc.Quickload()
 	if e != nil {
