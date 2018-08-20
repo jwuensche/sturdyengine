@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
+	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
 )
 
 // InitializeAPI sets informations required by the connection and also creates said. If the connection cannot be established returns error and struct member Conn is unset
@@ -41,7 +42,7 @@ func (conn *Connection) Close() (e error) {
 	return
 }
 
-func (conn *Connection) sendMessage(r *Request) (p []byte, e error) {
+func (conn *Connection) sendMessage(r *krpc.Request) (p []byte, e error) {
 	req, e := proto.Marshal(r)
 
 	if e != nil {

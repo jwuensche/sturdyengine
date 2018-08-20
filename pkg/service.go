@@ -1,15 +1,18 @@
 package sturdyengine
 
-import "github.com/golang/protobuf/proto"
+import (
+	"github.com/golang/protobuf/proto"
+	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
+)
 
 //GetStatus calls remote procedure `GetStatus` and returns the response in form of the proto buffer message
-func (conn *Connection) GetStatus() (res Status, e error) {
-	pc := ProcedureCall{
+func (conn *Connection) GetStatus() (res krpc.Status, e error) {
+	pc := krpc.ProcedureCall{
 		Service:   "KRPC",
 		Procedure: "GetStatus",
 	}
-	pr := Request{
-		Calls: []*ProcedureCall{&pc},
+	pr := krpc.Request{
+		Calls: []*krpc.ProcedureCall{&pc},
 	}
 
 	p, e := conn.sendMessage(&pr)
@@ -17,7 +20,7 @@ func (conn *Connection) GetStatus() (res Status, e error) {
 		return
 	}
 
-	r := Response{}
+	r := krpc.Response{}
 	e = proto.Unmarshal(p, &r)
 	if e != nil {
 		return
@@ -28,13 +31,13 @@ func (conn *Connection) GetStatus() (res Status, e error) {
 }
 
 //GetServices calls KRPC remote procedure `GetServices` and returns Service Structure
-func (conn *Connection) GetServices() (res Services, e error) {
-	pc := ProcedureCall{
+func (conn *Connection) GetServices() (res krpc.Services, e error) {
+	pc := krpc.ProcedureCall{
 		Service:   "KRPC",
 		Procedure: "GetServices",
 	}
-	pr := Request{
-		Calls: []*ProcedureCall{&pc},
+	pr := krpc.Request{
+		Calls: []*krpc.ProcedureCall{&pc},
 	}
 
 	p, e := conn.sendMessage(&pr)
@@ -42,7 +45,7 @@ func (conn *Connection) GetServices() (res Services, e error) {
 		return
 	}
 
-	r := &Response{}
+	r := &krpc.Response{}
 	e = proto.Unmarshal(p, r)
 	if e != nil {
 		return

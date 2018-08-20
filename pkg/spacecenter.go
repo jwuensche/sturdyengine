@@ -2,6 +2,7 @@ package sturdyengine
 
 import (
 	"github.com/golang/protobuf/proto"
+	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
 )
 
 //InitSpaceCenter creates a SpaceCenter instance with Vessel and Control being set to the current active Values
@@ -18,7 +19,7 @@ func (sc *SpaceCenter) GetGameMode() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_GameMode", nil)
 
 	p, e := sc.conn.sendMessage(pr)
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 
 	return
@@ -29,9 +30,26 @@ func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 	pr := createRequest("SpaceCenter", "get_ActiveVessel", nil)
 
 	p, e := sc.conn.sendMessage(pr)
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	r = res.GetResults()[0].GetValue()
+	return
+}
+
+//SetPhysicsWarpFactor sets the physical warp factor on a range of 0 ... 3, this resets to 0 if onrailswarp is active
+func (sc *SpaceCenter) SetPhysicsWarpFactor(factor uint8) (e error) {
+	arg := [][]byte{[]byte{2 * factor}}
+	pr := createRequest("SpaceCenter", "set_PhysicsWarpFactor", createArguments(arg))
+	_, e = sc.conn.sendMessage(pr)
+	return
+}
+
+func (sc *SpaceCenter) GetPhysicsWarpFactor() (fac uint8, e error) {
+	pr := createRequest("SpaceCenter", "get_PhysicsWarpFactor", nil)
+	p, e := sc.conn.sendMessage(pr)
+	res := &krpc.Response{}
+	proto.Unmarshal(p, res)
+	fac = res.GetResults()[0].GetValue()[0] / 2
 	return
 }
 
@@ -42,7 +60,7 @@ func (sc *SpaceCenter) GetVesselOrbit(vessel []byte) (orb []byte, e error) {
 	arg := [][]byte{vessel}
 	pr := createRequest("SpaceCenter", "Vessel_get_Orbit", createArguments(arg))
 	p, e := sc.conn.sendMessage(pr)
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	orb = res.GetResults()[0].GetValue()
 	return
@@ -121,7 +139,7 @@ func (sc *SpaceCenter) getOrbitInfo(orbit []byte, procedure string) (alt float64
 	if e != nil {
 		return
 	}
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	alt = byteToFloat64(res.GetResults()[0].GetValue())
 	return
@@ -134,7 +152,7 @@ func (sc *SpaceCenter) getOrbitInfoFloat32(orbit []byte, procedure string) (alt 
 	if e != nil {
 		return
 	}
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	alt = byteToFloat32(res.GetResults()[0].GetValue())
 	return
@@ -151,7 +169,7 @@ func (sc *SpaceCenter) GetVesselControl(vessel []byte) (r []byte, e error) {
 	if e != nil {
 		return
 	}
-	res := &Response{}
+	res := &krpc.Response{}
 	e = proto.Unmarshal(p, res)
 	if e != nil {
 		return
@@ -166,7 +184,7 @@ func (sc *SpaceCenter) GetSAS(control []byte) (r bool, e error) {
 	arg := [][]byte{control}
 	pr := createRequest("SpaceCenter", "Control_get_SAS", createArguments(arg))
 	p, e := sc.conn.sendMessage(pr)
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	r = byteToBool(res.GetResults()[0].GetValue())
 	return
@@ -192,7 +210,7 @@ func (sc *SpaceCenter) ActivateNextStage(control []byte) (e error) {
 	if e != nil {
 		return
 	}
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 
 	return
@@ -206,7 +224,7 @@ func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
 	if e != nil {
 		return
 	}
-	res := &Response{}
+	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
 	val = byteToFloat32(res.GetResults()[0].GetValue())
 	return
@@ -252,21 +270,21 @@ func (sc *SpaceCenter) ToggleActionGroup(control []byte, group []byte) (e error)
 
 // REQUEST AND ARGMUENT CREATION
 
-func createRequest(service string, procedure string, arguments []*Argument) (pr *Request) {
-	pc := &ProcedureCall{
+func createRequest(service string, procedure string, arguments []*krpc.Argument) (pr *krpc.Request) {
+	pc := &krpc.ProcedureCall{
 		Service:   service,
 		Procedure: procedure,
 		Arguments: arguments,
 	}
-	pr = &Request{
-		Calls: []*ProcedureCall{pc},
+	pr = &krpc.Request{
+		Calls: []*krpc.ProcedureCall{pc},
 	}
 	return
 }
 
-func createArguments(args [][]byte) (arg []*Argument) {
+func createArguments(args [][]byte) (arg []*krpc.Argument) {
 	for pos, val := range args {
-		arg = append(arg, &Argument{
+		arg = append(arg, &krpc.Argument{
 			Position: uint32(pos),
 			Value:    val,
 		})

@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/jwuensche/sturdyengine/pkg"
+	krpc "github.com/jwuensche/sturdyengine/pkg/krpcproto"
 	"github.com/op/go-logging"
 )
 
@@ -30,13 +31,13 @@ var backend = logging.NewLogBackend(os.Stderr, "", 0)
 var c = sturdyengine.Connection{}
 
 func TestServiceProto(t *testing.T) {
-	ser := sturdyengine.Service{
+	ser := krpc.Service{
 		Name:          "Foo",
 		Documentation: "Bar",
 	}
 
-	sers := sturdyengine.Services{
-		Services: []*sturdyengine.Service{&ser},
+	sers := krpc.Services{
+		Services: []*krpc.Service{&ser},
 	}
 
 	p, e := proto.Marshal(&sers)
@@ -45,7 +46,7 @@ func TestServiceProto(t *testing.T) {
 		t.FailNow()
 	}
 
-	test := &sturdyengine.Services{}
+	test := &krpc.Services{}
 
 	proto.Unmarshal(p, test)
 
@@ -156,6 +157,13 @@ func TestSpaceCenter(t *testing.T) {
 		log.Info(e)
 		t.FailNow()
 	}
+	sc.SetPhysicsWarpFactor(1)
+	val, e := sc.GetPhysicsWarpFactor()
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	log.Info(val)
 	sc.GetSAS(control)
 	//Throttle
 	sc.SetThrottle(0.54)
@@ -191,6 +199,13 @@ func TestSpaceCenter(t *testing.T) {
 	}
 	log.Info(time)
 	alt, e = sc.GetRadius(orb)
+	if e != nil {
+		log.Info(e)
+		t.FailNow()
+	}
+	//Test this further not sure about it yet
+	spd, e := sc.GetSpeed(orb)
+	log.Info(spd)
 	if e != nil {
 		log.Info(e)
 		t.FailNow()
