@@ -53,6 +53,31 @@ func (sc *SpaceCenter) GetPhysicsWarpFactor() (fac uint8, e error) {
 	return
 }
 
+func (sc *SpaceCenter) SetWarp(factor uint64) (e error) {
+	arg := [][]byte{uint64ToByte(factor)}
+	pr := createRequest("SpaceCenter", "set_RailsWarpFactor", createArguments(arg))
+	_, e = sc.conn.sendMessage(pr)
+	return
+}
+
+func (sc *SpaceCenter) GetWarp() (fac uint64, e error) {
+	pr := createRequest("SpaceCenter", "get_RailsWarpFactor", nil)
+	p, e := sc.conn.sendMessage(pr)
+	res := &krpc.Response{}
+	proto.Unmarshal(p, res)
+	fac = byteToUint64(res.GetResults()[0].GetValue())
+	return
+}
+
+func (sc *SpaceCenter) GetMaximumWarpFactor() (fac uint64, e error) {
+	pr := createRequest("SpaceCenter", "get_MaximumRailsWarpFactor", nil)
+	p, e := sc.conn.sendMessage(pr)
+	res := &krpc.Response{}
+	proto.Unmarshal(p, res)
+	fac = byteToUint64(res.GetResults()[0].GetValue())
+	return
+}
+
 // ORBIT - SPACECENTER.VESSEL.ORBIT || SPACECENTER.CELESTIALBODY.ORBIT
 
 //GetVesselOrbit returns a snapshot of the current orbit the vessel is on
