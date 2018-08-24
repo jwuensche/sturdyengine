@@ -1,12 +1,14 @@
-hash: fc178ab69049a8c2867cb895f0e414d5d79920160b349fc57f82f19b3acbe25c
-updated: 2018-08-10T12:18:20.312739023+02:00
+hash: c3e7c49f5c691304ce8c89267edf3f52e5ef080032aabcdc2c9fd7c752a56098
+updated: 2018-08-24T11:50:00.084655066+02:00
 imports:
 - name: github.com/golang/protobuf
-  version: 89a0c16f4dc2a70c0ed864d8ef64878f24fdaa51
+  version: b27b920f9e71b439b873b17bf99f56467623814a
   subpackages:
   - proto
 - name: github.com/gorilla/websocket
-  version: 5ed622c449da6d44c3c8329331ff47a9e5844f71
-testImports:
+  version: b378caee5b2a673abe3897c40fde529bff7b986e
+- name: github.com/iancoleman/strcase
+  version: 3605ed457bf7f8caa1371b4fafadadc026673479
 - name: github.com/op/go-logging
   version: 970db520ece77730c7e4724c61121037378659d9
+testImports: []

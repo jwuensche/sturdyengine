@@ -1,2 +1,5 @@
 package: github.com/jwuensche/sturdyengine
-import: []
+import:
+  - package: github.com/gorilla/websocket
+  - package: github.com/golang/protobuf
+  - package: github.com/op/go-logging
