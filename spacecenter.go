@@ -1,12 +1,18 @@
 package sturdyengine
 
 import (
+	"errors"
+
 	"github.com/golang/protobuf/proto"
 	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
-//InitSpaceCenter creates a SpaceCenter instance with Vessel and Control being set to the current active Values
-func InitSpaceCenter(conn *Connection) (sc SpaceCenter, e error) {
+//NewSpaceCenter creates a SpaceCenter instance with Vessel and Control being set to the current active Values
+func NewSpaceCenter(conn *Connection) (sc SpaceCenter, e error) {
+	if conn.Conn == nil {
+		e = errors.New("Connection ist nil")
+		return
+	}
 	sc = SpaceCenter{}
 	sc.conn = conn
 	sc.Vessel, e = sc.GetActiveVessel()
@@ -38,7 +44,7 @@ func (sc *SpaceCenter) GetActiveVessel() (r []byte, e error) {
 
 //SetPhysicsWarpFactor sets the physical warp factor on a range of 0 ... 3, this resets to 0 if onrailswarp is active
 func (sc *SpaceCenter) SetPhysicsWarpFactor(factor uint8) (e error) {
-	arg := [][]byte{[]byte{2 * factor}}
+	arg := [][]byte{{2 * factor}}
 	pr := createRequest("SpaceCenter", "set_PhysicsWarpFactor", createArguments(arg))
 	_, e = sc.conn.sendMessage(pr)
 	return
