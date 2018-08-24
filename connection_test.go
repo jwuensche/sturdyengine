@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/jwuensche/sturdyengine"
 	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
-	"github.com/jwuensche/sturdyengine/pkg"
 	"github.com/op/go-logging"
 )
 
@@ -92,26 +92,21 @@ func TestServices(t *testing.T) {
 		t.FailNow()
 	}
 
-	f, _ := os.Create("docs/procedure_doc.md")
+	f, _ := os.Create("../docs/procedure_doc.dat")
 	defer f.Close()
 
 	for _, service := range r.GetServices() {
-		f.WriteString("## " + service.GetName() + "\n")
-		f.WriteString("#### Classes\n")
-		for _, class := range service.GetClasses() {
-			f.WriteString("```\n" + class.GetName() + "\n" + class.GetDocumentation() + "\n```\n")
-		}
+		f.WriteString("# " + service.GetName() + "\n")
 		for _, procedure := range service.GetProcedures() {
-			f.WriteString("### " + procedure.GetName() + "\n\n")
-			f.WriteString("```\n" + procedure.GetDocumentation() + "\n```\n")
-			f.WriteString("#### Parameters \n")
+			f.WriteString("## " + procedure.GetName() + "\n")
+			f.WriteString("### Parameters\n")
 			for _, parameter := range procedure.GetParameters() {
-				f.WriteString("```\n")
-				f.WriteString(parameter.GetName() + "		" + parameter.GetType().GetName() + "\n")
-				f.WriteString("```\n")
+				f.WriteString(parameter.GetName() + "," + parameter.GetType().GetName() + "\n")
 			}
-			f.WriteString("#### Return \n")
-			f.WriteString("```\n" + procedure.GetReturnType().GetName() + "```\n")
+			f.WriteString("### Return\n")
+			if procedure.GetReturnType().GetName() != "" {
+				f.WriteString(procedure.GetReturnType().GetName() + "\n")
+			}
 		}
 	}
 }
