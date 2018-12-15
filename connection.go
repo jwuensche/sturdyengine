@@ -34,7 +34,7 @@ func NewConnection(clientName string, port string) (conn Connection, e error) {
 
 // NewDefaultConnection simply calls InitializeAPI with the default port of the krpc mod
 func NewDefaultConnection() (conn Connection, e error) {
-	conn, e = NewConnection("sturdyengine", "5000")
+	conn, e = NewConnection("sturdyengine", "50000")
 	return
 }
 

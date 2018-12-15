@@ -1,24 +1,24 @@
-package sturdyengine
+package util
 
 import (
 	"encoding/binary"
 	"math"
 )
 
-func byteToFloat32(r []byte) (f32 float32) {
+func ByteToFloat32(r []byte) (f32 float32) {
 	bits := binary.LittleEndian.Uint32(r)
 	f32 = math.Float32frombits(bits)
 	return
 }
 
-func float32toByte(r float32) (b []byte) {
+func Float32toByte(r float32) (b []byte) {
 	bits := math.Float32bits(r)
 	b = make([]byte, 4)
 	binary.LittleEndian.PutUint32(b, bits)
 	return
 }
 
-func boolToByte(state bool) (b []byte) {
+func BoolToByte(state bool) (b []byte) {
 	if state {
 		b = []byte{byte(1)}
 	} else {
@@ -27,25 +27,25 @@ func boolToByte(state bool) (b []byte) {
 	return
 }
 
-func byteToFloat64(r []byte) (f64 float64) {
+func ByteToFloat64(r []byte) (f64 float64) {
 	bits := binary.LittleEndian.Uint64(r)
 	f64 = math.Float64frombits(bits)
 	return
 }
 
-func byteToBool(r []byte) (b bool) {
+func ByteToBool(r []byte) (b bool) {
 	if r[0] == 1 {
 		b = true
 	}
 	return
 }
 
-func uint64ToByte(r uint64) (b []byte) {
+func Uint64ToByte(r uint64) (b []byte) {
 	binary.LittleEndian.PutUint64(b, r)
 	return
 }
 
-func byteToUint64(r []byte) (u64 uint64) {
+func ByteToUint64(r []byte) (u64 uint64) {
 	u64 = binary.LittleEndian.Uint64(r)
 	return
 }

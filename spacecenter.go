@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/golang/protobuf/proto"
+	util "github.com/jwuensche/sturdyengine/internal"
 	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
@@ -50,6 +51,7 @@ func (sc *SpaceCenter) SetPhysicsWarpFactor(factor uint8) (e error) {
 	return
 }
 
+//GetPhysicsWarpFactor returns the current on a range of 0 ... 3
 func (sc *SpaceCenter) GetPhysicsWarpFactor() (fac uint8, e error) {
 	pr := createRequest("SpaceCenter", "get_PhysicsWarpFactor", nil)
 	p, e := sc.conn.sendMessage(pr)
@@ -60,7 +62,7 @@ func (sc *SpaceCenter) GetPhysicsWarpFactor() (fac uint8, e error) {
 }
 
 func (sc *SpaceCenter) SetWarp(factor uint64) (e error) {
-	arg := [][]byte{uint64ToByte(factor)}
+	arg := [][]byte{util.Uint64ToByte(factor)}
 	pr := createRequest("SpaceCenter", "set_RailsWarpFactor", createArguments(arg))
 	_, e = sc.conn.sendMessage(pr)
 	return
@@ -71,16 +73,17 @@ func (sc *SpaceCenter) GetWarp() (fac uint64, e error) {
 	p, e := sc.conn.sendMessage(pr)
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	fac = byteToUint64(res.GetResults()[0].GetValue())
+	fac = util.ByteToUint64(res.GetResults()[0].GetValue())
 	return
 }
 
+//GetMaximumWarpFactor returns the maximal available RailsWarpFactor at the moment
 func (sc *SpaceCenter) GetMaximumWarpFactor() (fac uint64, e error) {
 	pr := createRequest("SpaceCenter", "get_MaximumRailsWarpFactor", nil)
 	p, e := sc.conn.sendMessage(pr)
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	fac = byteToUint64(res.GetResults()[0].GetValue())
+	fac = util.ByteToUint64(res.GetResults()[0].GetValue())
 	return
 }
 
@@ -172,7 +175,7 @@ func (sc *SpaceCenter) getOrbitInfo(orbit []byte, procedure string) (alt float64
 	}
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	alt = byteToFloat64(res.GetResults()[0].GetValue())
+	alt = util.ByteToFloat64(res.GetResults()[0].GetValue())
 	return
 }
 
@@ -185,7 +188,7 @@ func (sc *SpaceCenter) getOrbitInfoFloat32(orbit []byte, procedure string) (alt 
 	}
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	alt = byteToFloat32(res.GetResults()[0].GetValue())
+	alt = util.ByteToFloat32(res.GetResults()[0].GetValue())
 	return
 }
 
@@ -217,13 +220,13 @@ func (sc *SpaceCenter) GetSAS(control []byte) (r bool, e error) {
 	p, e := sc.conn.sendMessage(pr)
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	r = byteToBool(res.GetResults()[0].GetValue())
+	r = util.ByteToBool(res.GetResults()[0].GetValue())
 	return
 }
 
 //SetSAS sets the state of the given control unit's SAS, true to activate
 func (sc *SpaceCenter) SetSAS(vessel []byte, state bool) (e error) {
-	s := boolToByte(state)
+	s := util.BoolToByte(state)
 	arg := [][]byte{vessel, s}
 	pr := createRequest("SpaceCenter", "Control_set_SAS", createArguments(arg))
 
@@ -257,13 +260,13 @@ func (sc *SpaceCenter) GetThrottle() (val float32, e error) {
 	}
 	res := &krpc.Response{}
 	proto.Unmarshal(p, res)
-	val = byteToFloat32(res.GetResults()[0].GetValue())
+	val = util.ByteToFloat32(res.GetResults()[0].GetValue())
 	return
 }
 
 //SetThrottle sets the Throtlle of the given control unit as float value between 0 and 1
 func (sc *SpaceCenter) SetThrottle(val float32) (e error) {
-	arg := [][]byte{sc.Control, float32toByte(val)}
+	arg := [][]byte{sc.Control, util.Float32toByte(val)}
 	pr := createRequest("SpaceCenter", "Control_set_Throttle", createArguments(arg))
 	_, e = sc.conn.sendMessage(pr)
 
