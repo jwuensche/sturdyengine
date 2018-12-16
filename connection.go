@@ -10,6 +10,14 @@ import (
 	krpc "github.com/jwuensche/sturdyengine/internal/krpcproto"
 )
 
+// Connection contains all inforamtion required by websocket to establish connection
+type Connection struct {
+	URI url.URL
+
+	Upgrader websocket.Upgrader
+	Conn     *websocket.Conn
+}
+
 // NewConnection sets informations required by the connection and also creates said. If the connection cannot be established returns error and struct member Conn is unset
 func NewConnection(clientName string, port string) (conn Connection, e error) {
 	conn = Connection{}
@@ -68,5 +76,29 @@ func (conn *Connection) sendMessage(r *krpc.Request) (p []byte, e error) {
 		return
 	}
 
+	return
+}
+
+// REQUEST AND ARGMUENT CREATION
+
+func createRequest(service string, procedure string, arguments []*krpc.Argument) (pr *krpc.Request) {
+	pc := &krpc.ProcedureCall{
+		Service:   service,
+		Procedure: procedure,
+		Arguments: arguments,
+	}
+	pr = &krpc.Request{
+		Calls: []*krpc.ProcedureCall{pc},
+	}
+	return
+}
+
+func createArguments(args [][]byte) (arg []*krpc.Argument) {
+	for pos, val := range args {
+		arg = append(arg, &krpc.Argument{
+			Position: uint32(pos),
+			Value:    val,
+		})
+	}
 	return
 }

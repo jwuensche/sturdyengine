@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/jwuensche/sturdyengine"
 )
@@ -15,7 +16,17 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	sc.SetThrottle(1)
-	sc.SetSAS(sc.Vessel, true)
-	sc.ActivateNextStage(sc.Control)
+
+	vessel, err := sc.NewVessel()
+	if err != nil {
+		os.Exit(1)
+	}
+
+	sc.Quicksave()
+
+	vessel.SetThrottle(0.75)
+	vessel.ActivateNextStage()
+	time.Sleep(10 * time.Second)
+	sc.Quickload()
+
 }

@@ -41,6 +41,7 @@ func ByteToBool(r []byte) (b bool) {
 }
 
 func Uint64ToByte(r uint64) (b []byte) {
+	b = make([]byte, 8)
 	binary.LittleEndian.PutUint64(b, r)
 	return
 }
